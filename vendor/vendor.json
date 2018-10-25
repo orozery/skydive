@@ -74,6 +74,12 @@
 			"revision": "dcfedd50ed5334f96adee43fc88518a4f095e15c"
 		},
 		{
+			"checksumSHA1": "TJeCBInty+MsPAh7Hbz79rIKaN0=",
+			"path": "github.com/aws/aws-sdk-go",
+			"revision": "803c35f732cb53e133b968e27fb7fbd337524a22",
+			"revisionTime": "2018-10-24T19:23:52Z"
+		},
+		{
 			"checksumSHA1": "4QnLdmB1kG3N+KlDd1N+G9TWAGQ=",
 			"path": "github.com/beorn7/perks/quantile",
 			"revision": "b965b613227fddccbfffe13eae360ed3fa822f8d"

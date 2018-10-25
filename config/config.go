@@ -156,18 +156,29 @@ func init() {
 	cfg.SetDefault("rbac.model.policy_effect", []string{"some(where (p_eft == allow)) && !some(where (p_eft == deny))"})
 	cfg.SetDefault("rbac.model.matchers", []string{"g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act"})
 
-	cfg.SetDefault("storage.elasticsearch.driver", "elasticsearch")  // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.elasticsearch.host", "127.0.0.1:9200")   // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.elasticsearch.bulk_maxdelay", 5)         // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.elasticsearch.index_age_limit", 0)       // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.elasticsearch.index_entries_limit", 0)   // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.elasticsearch.indices_to_keep", 0)       // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.memory.driver", "memory")                // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.orientdb.driver", "orientdb")            // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.orientdb.addr", "http://localhost:2480") // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.orientdb.database", "Skydive")           // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.orientdb.username", "root")              // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.orientdb.password", "root")              // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.driver", "elasticsearch")                                // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.host", "127.0.0.1:9200")                                 // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.bulk_maxdelay", 5)                                       // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.index_age_limit", 0)                                     // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.index_entries_limit", 0)                                 // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.elasticsearch.indices_to_keep", 0)                                     // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.memory.driver", "memory")                                              // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.orientdb.driver", "orientdb")                                          // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.orientdb.addr", "http://localhost:2480")                               // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.orientdb.database", "Skydive")                                         // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.orientdb.username", "root")                                            // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.orientdb.password", "root")                                            // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.driver", "objectstorage")                                // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.endpoint", "http://s3.amazonaws.com")                    // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.region", "us-east-1")                                    // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.bucket", "bucket")                                       // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.access_key", "AKIAIOSFODNN7EXAMPLE")                     // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.secret_key", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.entity_id", "0000")                                      // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.collector_type", "flows")                                // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.collector_id", 0)                                        // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.root_output_dir", "logs")                                // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.max_seconds_per_stream", 86400)                          // defined for backward compatibility and to set defaults
 
 	cfg.SetDefault("ui", map[string]interface{}{})
 

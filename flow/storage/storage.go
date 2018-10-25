@@ -32,6 +32,7 @@ import (
 	"github.com/skydive-project/skydive/filters"
 	"github.com/skydive-project/skydive/flow"
 	"github.com/skydive-project/skydive/flow/storage/elasticsearch"
+	"github.com/skydive-project/skydive/flow/storage/objectstorage"
 	"github.com/skydive-project/skydive/flow/storage/orientdb"
 	"github.com/skydive-project/skydive/logging"
 )
@@ -67,6 +68,8 @@ func NewStorage(backend string, etcdClient *etcd.Client) (s Storage, err error) 
 			err = fmt.Errorf("Can't connect to OrientDB server: %v", err)
 			return
 		}
+	case "objectstorage":
+		s = objectstorage.New(backend)
 	case "memory":
 		return
 	default:

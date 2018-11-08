@@ -269,7 +269,7 @@
           cancel-builds-on-update: true
     builders:
       - skydive-test:
-          test: BACKEND=memory scripts/ci/run-istio-tests.sh
+          test: FLOW_BACKEND=memory TOPOLOGY_BACKEND=memory scripts/ci/run-istio-tests.sh
     publishers:
       - junit:
           results: tests.xml
@@ -320,7 +320,7 @@
     builders:
       - skydive-cleanup
       - skydive-test:
-          test: BACKEND=elasticsearch scripts/ci/run-functional-tests.sh
+          test: FLOW_BACKEND=elasticsearch TOPOLOGY_BACKEND=elasticsearch scripts/ci/run-functional-tests.sh
     publishers:
       - junit:
           results: tests.xml
@@ -338,7 +338,25 @@
     builders:
       - skydive-cleanup
       - skydive-test:
-          test: BACKEND=orientdb scripts/ci/run-functional-tests.sh
+          test: FLOW_BACKEND=orientdb TOPOLOGY_BACKEND=orientdb scripts/ci/run-functional-tests.sh
+    publishers:
+      - junit:
+          results: tests.xml
+      - chuck-norris
+
+- job:
+    name: 'skydive-functional-tests-backend-objectstorage'
+    defaults: skydive
+    triggers:
+      - skydive-pull-request:
+          name: "functional-tests-backend-objectstorage"
+          trigger-prefix: "(all )?"
+          only-trigger-phrase: false
+          cancel-builds-on-update: true
+    builders:
+      - skydive-cleanup
+      - skydive-test:
+          test: FLOW_BACKEND=objectstorage TOPOLOGY_BACKEND=memory scripts/ci/run-functional-tests.sh
     publishers:
       - junit:
           results: tests.xml

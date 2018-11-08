@@ -19,7 +19,8 @@ units=1
 functionals=1
 scale=1
 coveralls=0
-backend=elasticsearch
+flow_backend=elasticsearch
+topology_backend=elasticsearch
 
 generate_cover_data() {
     rm -rf "$workdir"
@@ -36,7 +37,7 @@ generate_cover_data() {
         export SKYDIVE_ANALYZERS=localhost:8082
 
         coverfile="../$workdir/functional.cover"
-        make test.functionals.batch VERBOSE=true WITH_EBPF=true WITH_K8S=false TIMEOUT=20m GOFLAGS="-cover -covermode=$mode -coverpkg=$PKG" ARGS="$ARGS -test.coverprofile=$coverfile -standalone -analyzer.topology.backend $backend -analyzer.flow.backend $backend" TEST_PATTERN=$TEST_PATTERN
+        make test.functionals.batch VERBOSE=true WITH_EBPF=true WITH_K8S=false TIMEOUT=20m GOFLAGS="-cover -covermode=$mode -coverpkg=$PKG" ARGS="$ARGS -test.coverprofile=$coverfile -standalone -analyzer.topology.backend $topology_backend -analyzer.flow.backend $flow_backend" TEST_PATTERN=$TEST_PATTERN
     fi
 
     if [ "$scale" -eq 1 ]; then
@@ -101,7 +102,10 @@ do
     --no-scale)
         scale=0 ;;
     --orientdb)
-        backend=orientdb ;;
+        flow_backend=orientdb
+        topology_backend=orientdb ;;
+    --objectstorage)
+        flow_backend=objectstorage ;;
     --coveralls)
         coveralls=1 ;;
     *)

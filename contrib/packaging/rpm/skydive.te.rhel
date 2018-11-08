@@ -50,7 +50,7 @@ sysnet_dns_name_resolve(skydive_t)
 type skydive_etcd_ports_t;
 corenet_port(skydive_etcd_ports_t);
 
-# analyzer DB connect tcp/9200 (ElasticSearch) tcp/2480 (OrientDB)
+# analyzer DB connect tcp/9200 (ElasticSearch) tcp/2480 (OrientDB) tcp/9000 (objectstorage)
 type skydive_analyzer_db_connect_ports_t;
 corenet_port(skydive_analyzer_db_connect_ports_t);
 

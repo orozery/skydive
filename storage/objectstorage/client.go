@@ -7,12 +7,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"bytes"
 )
 
 // Client allows uploading objects to an object storage service
 type Client interface {
 	// WriteObject stores a single object
 	WriteObject(bucket, objectKey, data, contentType, contentEncoding string, metadata map[string]*string) error
+	// ReadObject reads a single object
+	ReadObject(bucket, objectKey string) ([]byte, error)
+	// ListObjects lists objects withing a bucket
+	ListObjects(bucket, prefix string) ([]*string, error)
 }
 
 // S3Client allows uploading objects to an S3-compatible object storage service
@@ -32,6 +37,43 @@ func (s *S3Client) WriteObject(bucket, objectKey, data, contentType, contentEnco
 	})
 
 	return err
+}
+
+// ReadObject reads a single object
+func (s *S3Client) ReadObject(bucket, objectKey string) ([]byte, error) {
+	getObjectOutput, err := s.s3Client.GetObject(&s3.GetObjectInput{
+		Bucket:          aws.String(bucket),
+		Key:             aws.String(objectKey),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(getObjectOutput.Body)
+	return buf.Bytes(), nil
+}
+
+// ListObjects lists objects withing a bucket
+func (s *S3Client) ListObjects(bucket, prefix string) ([]*string, error) {
+	params := &s3.ListObjectsV2Input{
+		Bucket:          aws.String(bucket),
+		Prefix:          aws.String(prefix),
+	}
+	objectKeys := make([]string, 0)
+	fn := func(page *s3.ListObjectsV2Output, lastPage bool) bool {
+		for _, object := range page.Contents {
+			objectKeys = append(objectKeys, object.Key)
+		}
+		return true
+	}
+	err := s.s3Client.ListObjectsV2Pages(params, fn)
+	if err != nil {
+		return nil, err
+	}
+
+	return objectKeys, nil
 }
 
 // New creates a new S3-compatible object storage client

@@ -171,6 +171,7 @@ if %{_sbindir}/selinuxenabled && [ "$1" = "1" ] ; then
     %{_sbindir}/semanage port -a -t skydive_etcd_ports_t -p tcp 12379-12380
     %{_sbindir}/semanage port -a -t skydive_analyzer_db_connect_ports_t -p tcp 2480
     %{_sbindir}/semanage port -a -t skydive_analyzer_db_connect_ports_t -p tcp 9200
+    %{_sbindir}/semanage port -a -t skydive_analyzer_db_connect_ports_t -p tcp 9000
 fi
 %systemd_post %{basename:%{name}-analyzer.service}
 

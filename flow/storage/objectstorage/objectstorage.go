@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/google/gopacket/layers"
 	"github.com/skydive-project/skydive/common"
 	"github.com/skydive-project/skydive/config"
 	"github.com/skydive-project/skydive/filters"
@@ -92,17 +93,78 @@ func (c *ObjectStorage) StoreFlows(flows []*flow.Flow) error {
 
 // SearchRawPackets searches flow raw packets matching filters in the database
 func (c *ObjectStorage) SearchRawPackets(fsq filters.SearchQuery, packetFilter *filters.Filter) (map[string]*flow.RawPackets, error) {
-	return nil, nil
+	flowset, err := c.SearchFlows(fsq)
+	if err != nil {
+		return err
+	}
+	flowset = flowset.Filter(packetFilter)
+	rawpackets := make(map[string]*flow.RawPackets)
+	for _, currFlow := range flowset.Flows {
+		if fr, ok := rawpackets[currFlow.UUID]; ok {
+			fr.RawPackets = append(fr.RawPackets, currFlow.LastRawPackets)
+		} else {
+			linkType, err := currFlow.LinkType()
+			if err != nil {
+				linkType = layers.LinkTypeNull
+			}
+			rawpackets[currFlow.UUID] = &flow.RawPackets{
+				LinkType:   linkType,
+				RawPackets: []*flow.RawPacket{currFlow.LastRawPackets},
+			}
+		}
+	}
+	return rawpackets, nil
 }
 
 // SearchMetrics searches flow metrics matching filters in the database
 func (c *ObjectStorage) SearchMetrics(fsq filters.SearchQuery, metricFilter *filters.Filter) (map[string][]common.Metric, error) {
-	return nil, nil
+	flowset, err := c.SearchFlows(fsq)
+	if err != nil {
+		return err
+	}
+	flowset = flowset.Filter(metricFilter)
+	metrics := make(map[string][]common.Metric)
+	for _, currFlow := range flowset.Flows {
+		metrics[currFlow.UUID] = append(metrics[currFlow.UUID], currFlow.Metric)
+	}
+	return metrics, nil
+}
+
+func (c *ObjectStorage) getAllFlows() (*flow.FlowSet, error) {
+	objectKeys, err := c.client.ListObjects(c.bucket, c.objectPrefix)
+	if err != nil {
+		logging.GetLogger().Error("Failed to list objects: ", err)
+		return nil, err
+	}
+
+	flowset := flow.NewFlowSet()
+	for _, objectKey := range objectKeys {
+		objectBytes, err := c.client.ReadObject(c.bucket, objectKey)
+		if err != nil {
+			logging.GetLogger().Error("Failed to read object: ", err)
+			return nil, err
+		}
+
+		var flows []*flow.Flow
+		err = json.Unmarshal(objectBytes, &flows)
+		if err != nil {
+			logging.GetLogger().Warn("Failed to JSON-decode object: ", err)
+		} else {
+			flowset.Flows = append(flowset.Flows, *flows)
+		}
+	}
+
+	return flowset, nil
 }
 
 // SearchFlows search flow matching filters in the database
 func (c *ObjectStorage) SearchFlows(fsq filters.SearchQuery) (*flow.FlowSet, error) {
-	return nil, nil
+	flowset, err := c.getAllFlows()
+	if err != nil {
+		return err
+	}
+
+	return flowset.SearchQuery(fsq), nil
 }
 
 // Start the Object Storage client

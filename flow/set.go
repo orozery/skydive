@@ -292,3 +292,28 @@ func (fs *FlowSet) Filter(filter *filters.Filter) *FlowSet {
 	}
 	return flowset
 }
+
+// SearchQuery flows in a FlowSet
+func (fs *FlowSet) SearchQuery(query *filters.SearchQuery) *FlowSet {
+	flowset := NewFlowSet()
+	if query == nil {
+		return flowset
+	}
+
+	if query.Filter {
+		flowset = flowset.Filter(query.Filter)
+	}
+
+	if query.Sort {
+		flowset.Sort(common.SortOrder(query.SortOrder), query.SortBy)
+	}
+
+	if query.Dedup {
+		flowset.Dedup(query.DedupBy)
+	}
+
+	if query.PaginationRange != nil {
+		flowset.Slice(int(query.PaginationRange.From), int(query.PaginationRange.To))
+	}
+	return flowset
+}

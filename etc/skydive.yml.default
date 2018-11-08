@@ -333,11 +333,11 @@ storage:
   # Object Storage backend information.
     myobjectstorage:
       # driver: objectstorage
-      # endpoint: http://s3.amazonaws.com
-      # region: us-east-1
+      # endpoint: http://127.0.0.1:9000
+      # region: local
       # bucket: bucket
-      # access_key: AKIAIOSFODNN7EXAMPLE
-      # secret_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      # access_key: user
+      # secret_key: password
       # entity_id: 0000
       # collector_type: flows
       # collector_id: 0

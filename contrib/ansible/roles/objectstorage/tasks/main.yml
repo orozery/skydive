@@ -1,0 +1,41 @@
+---
+- name: Set facts
+  set_fact:
+    minio_path: "/opt/minio"
+    minio_client_path: "/opt/mc"
+    minio_data_path: "/opt/minio-data"
+    minio_endpoint: "http://127.0.0.1:9000"
+    minio_cluster_name: "local"
+    minio_access_key: "user"
+    minio_secret_key: "password"
+    bucket_name: "bucket"
+
+- name: Download minio
+  get_url:
+    url: https://dl.minio.io/server/minio/release/linux-amd64/minio
+    dest: "{{ minio_path }}"
+    mode: 0775
+
+- name: Download minio client
+  get_url:
+    url: https://dl.minio.io/client/mc/release/linux-amd64/mc
+    dest: "{{ minio_client_path }}"
+    mode: 0775
+
+- name: Create minio data directory
+  file:
+    path: "{{ minio_data_path }}"
+    state: directory
+    mode: 0755
+
+- name: Run minio server
+  shell: "{{ minio_path }} server {{ minio_data_path }} &"
+  environment:
+    MINIO_ACCESS_KEY: "{{ minio_access_key }}"
+    MINIO_SECRET_KEY: "{{ minio_secret_key }}"
+
+- name: Configure minio client
+  shell: "{{ minio_client_path }} config host add {{ minio_cluster_name }} {{ minio_endpoint }} {{ minio_access_key }} {{ minio_secret_key }} {{ minio_data_path }} --api S3v4"
+
+- name: Create bucket
+  shell: "{{ minio_client_path }} mb {{ minio_cluster_name }}/{{ bucket_name }}"

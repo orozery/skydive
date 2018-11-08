@@ -13,8 +13,50 @@ import (
 	"time"
 
 	"github.com/skydive-project/skydive/flow"
-	"github.com/skydive-project/skydive/storage/objectstorage/fake"
 )
+
+// FakeClient is a mock Object Storage client
+type FakeClient struct {
+	// WriteError holds the error that should be returned on WriteObject
+	WriteError error
+	// WriteCounter holds the number of times that WriteObject was called
+	WriteCounter int
+	// LastBucket holds the bucket argument used on the last call to WriteObject
+	LastBucket string
+	// LastObjectKey holds the objectKey argument used on the last call to WriteObject
+	LastObjectKey string
+	// LastData holds the data argument used on the last call to WriteObject
+	LastData string
+	// LastContentType holds the contentType argument used on the last call to WriteObject
+	LastContentType string
+	// LastContentEncoding holds the contentEncoding argument used on the last call to WriteObject
+	LastContentEncoding string
+	// LastMetadata holds the metadata argument used on the last call to WriteObject
+	LastMetadata map[string]*string
+}
+
+// WriteObject stores a single object
+func (c *FakeClient) WriteObject(bucket, objectKey, data, contentType, contentEncoding string, metadata map[string]*string) error {
+	c.WriteCounter++
+	c.LastBucket = bucket
+	c.LastObjectKey = objectKey
+	c.LastData = data
+	c.LastContentType = contentType
+	c.LastContentEncoding = contentEncoding
+	c.LastMetadata = metadata
+
+	return c.WriteError
+}
+
+// ReadObject reads a single object
+func (s *FakeClient) ReadObject(bucket, objectKey string) ([]byte, error) {
+	return nil, nil
+}
+
+// ListObjects lists objects withing a bucket
+func (s *FakeClient) ListObjects(bucket, prefix string) ([]*string, error) {
+	return nil, nil
+}
 
 func generateFlowArray(count int) []*flow.Flow {
 	flows := make([]*flow.Flow, count)
@@ -26,10 +68,10 @@ func generateFlowArray(count int) []*flow.Flow {
 	return flows
 }
 
-func newTestObjectStorage() (*ObjectStorage, *fake.Client) {
-	fakeClient := &fake.Client{}
+func newTestObjectStorage() (*ObjectStorage, *FakeClient) {
+	fakeClient := &FakeClient{}
 	ds := &ObjectStorage{
-		maxStreamDuration:          time.Second * time.Duration(86400),
+		maxStreamDuration:          time.Duration(24*time.Hour),
 		bucket:                     "myBucket",
 		objectPrefix:               "myPrefix",
 		client:                     fakeClient,

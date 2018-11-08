@@ -169,11 +169,11 @@ func init() {
 	cfg.SetDefault("storage.orientdb.username", "root")                                            // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.orientdb.password", "root")                                            // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.driver", "objectstorage")                                // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.endpoint", "http://s3.amazonaws.com")                    // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.region", "us-east-1")                                    // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.endpoint", "http://localhost:9000")                      // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.region", "local")                                        // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.bucket", "bucket")                                       // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.access_key", "AKIAIOSFODNN7EXAMPLE")                     // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.secret_key", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY") // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.access_key", "user")                                     // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.secret_key", "password")                                 // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.entity_id", "0000")                                      // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.collector_type", "flows")                                // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.collector_id", 0)                                        // defined for backward compatibility and to set defaults
@@ -223,7 +223,7 @@ func checkConfig() error {
 
 func setStorageDefaults() {
 	for key := range cfg.GetStringMap("storage") {
-		if key == "elasticsearch" || key == "orientdb" || key == "memory" {
+		if key == "elasticsearch" || key == "orientdb" || key == "memory" || key == "objectstorage" {
 			continue
 		}
 

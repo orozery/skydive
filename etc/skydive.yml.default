@@ -338,10 +338,7 @@ storage:
       # bucket: bucket
       # access_key: user
       # secret_key: password
-      # entity_id: 0000
-      # collector_type: flows
-      # collector_id: 0
-      # root_output_dir: logs
+      # object_prefix: logs
       # max_seconds_per_stream: 86400
 
   # Memory backend

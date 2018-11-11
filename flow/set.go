@@ -294,13 +294,9 @@ func (fs *FlowSet) Filter(filter *filters.Filter) *FlowSet {
 }
 
 // SearchQuery flows in a FlowSet
-func (fs *FlowSet) SearchQuery(query *filters.SearchQuery) *FlowSet {
+func (fs *FlowSet) SearchQuery(query filters.SearchQuery) *FlowSet {
 	flowset := NewFlowSet()
-	if query == nil {
-		return flowset
-	}
-
-	if query.Filter {
+	if query.Filter != nil {
 		flowset = flowset.Filter(query.Filter)
 	}
 

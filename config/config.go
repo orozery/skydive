@@ -170,15 +170,12 @@ func init() {
 	cfg.SetDefault("storage.orientdb.password", "root")                                            // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.driver", "objectstorage")                                // defined for backward compatibility and to set defaults
 	cfg.SetDefault("storage.objectstorage.endpoint", "http://localhost:9000")                      // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.region", "local")                                        // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.bucket", "bucket")                                       // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.access_key", "user")                                     // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.secret_key", "password")                                 // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.entity_id", "0000")                                      // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.collector_type", "flows")                                // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.collector_id", 0)                                        // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.root_output_dir", "logs")                                // defined for backward compatibility and to set defaults
-	cfg.SetDefault("storage.objectstorage.max_seconds_per_stream", 86400)                          // defined for backward compatibility and to set defaults
+	cfg.SetDefault("storage.objectstorage.region", "local")
+	cfg.SetDefault("storage.objectstorage.bucket", "bucket")
+	cfg.SetDefault("storage.objectstorage.access_key", "user")
+	cfg.SetDefault("storage.objectstorage.secret_key", "password")
+	cfg.SetDefault("storage.objectstorage.object_prefix", "flow_logs")
+	cfg.SetDefault("storage.objectstorage.max_seconds_per_stream", 24 * 60 * 60)
 
 	cfg.SetDefault("ui", map[string]interface{}{})
 

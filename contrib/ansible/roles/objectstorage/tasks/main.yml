@@ -1,9 +1,11 @@
 ---
 - name: Set facts
   set_fact:
-    minio_path: "/opt/minio"
-    minio_client_path: "/opt/mc"
-    minio_data_path: "/opt/minio-data"
+    minio_path: "/usr/local/bin/minio"
+    minio_client_path: "/usr/local/bin/mc"
+    minio_data_path: "/opt/minio/data"
+    minio_systemd_service_path: "/etc/systemd/system/minio.service"
+    minio_service_confiugration_path: "/etc/default/minio"
     minio_endpoint: "http://127.0.0.1:9000"
     minio_cluster_name: "local"
     minio_access_key: "user"
@@ -22,17 +24,40 @@
     dest: "{{ minio_client_path }}"
     mode: 0775
 
+- name: Download minio systemd service
+  get_url:
+    url: https://raw.githubusercontent.com/minio/minio-service/master/linux-systemd/minio.service
+    dest: "{{ minio_systemd_service_path }}"
+
+- name: Remove user/group from minio service definition
+  replace:
+    path: "{{ minio_systemd_service_path }}"
+    regexp: 'User=minio-user\nGroup=minio-user\n'
+    replace: ''
+    backup: no
+
+- name: Create minio service configuration file
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    create: yes
+    block: |
+      # Volume to be used for Minio server.
+      MINIO_VOLUMES="{{ minio_data_path }}"
+      # Access Key of the server.
+      MINIO_ACCESS_KEY={{ minio_access_key }}
+      # Secret key of the server.
+      MINIO_SECRET_KEY={{ minio_secret_key }}
+
 - name: Create minio data directory
   file:
     path: "{{ minio_data_path }}"
     state: directory
     mode: 0755
 
-- name: Run minio server
-  shell: "{{ minio_path }} server {{ minio_data_path }} &"
-  environment:
-    MINIO_ACCESS_KEY: "{{ minio_access_key }}"
-    MINIO_SECRET_KEY: "{{ minio_secret_key }}"
+- name: Start minio service
+  systemd:
+    name: minio
+    state: started
 
 - name: Configure minio client
   shell: "{{ minio_client_path }} config host add {{ minio_cluster_name }} {{ minio_endpoint }} {{ minio_access_key }} {{ minio_secret_key }} {{ minio_data_path }} --api S3v4"

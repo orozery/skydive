@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/google/gopacket/layers"
+
 	"github.com/skydive-project/skydive/common"
 	"github.com/skydive-project/skydive/config"
 	"github.com/skydive-project/skydive/filters"
@@ -45,7 +46,7 @@ func (c *ObjectStorage) StoreFlows(flows []*flow.Flow) error {
 
 	flowsString, err := json.Marshal(flows)
 	if err != nil {
-		logging.GetLogger().Error("Error encoding flows: " + err.Error())
+		logging.GetLogger().Error("Error encoding flows: ", err)
 		return err
 	}
 
@@ -71,7 +72,6 @@ func (c *ObjectStorage) StoreFlows(flows []*flow.Flow) error {
 	w.Write([]byte(flowsString))
 	w.Close()
 
-
 	currentStream := c.currentStream
 	if time.Since(currentStream.ID) >= c.maxStreamDuration {
 		currentStream = stream{ID: time.Now()}
@@ -95,13 +95,13 @@ func (c *ObjectStorage) StoreFlows(flows []*flow.Flow) error {
 func (c *ObjectStorage) SearchRawPackets(fsq filters.SearchQuery, packetFilter *filters.Filter) (map[string]*flow.RawPackets, error) {
 	flowset, err := c.SearchFlows(fsq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	flowset = flowset.Filter(packetFilter)
 	rawpackets := make(map[string]*flow.RawPackets)
 	for _, currFlow := range flowset.Flows {
 		if fr, ok := rawpackets[currFlow.UUID]; ok {
-			fr.RawPackets = append(fr.RawPackets, currFlow.LastRawPackets)
+			fr.RawPackets = append(fr.RawPackets, currFlow.LastRawPackets...)
 		} else {
 			linkType, err := currFlow.LinkType()
 			if err != nil {
@@ -109,7 +109,7 @@ func (c *ObjectStorage) SearchRawPackets(fsq filters.SearchQuery, packetFilter *
 			}
 			rawpackets[currFlow.UUID] = &flow.RawPackets{
 				LinkType:   linkType,
-				RawPackets: []*flow.RawPacket{currFlow.LastRawPackets},
+				RawPackets: currFlow.LastRawPackets,
 			}
 		}
 	}
@@ -120,7 +120,7 @@ func (c *ObjectStorage) SearchRawPackets(fsq filters.SearchQuery, packetFilter *
 func (c *ObjectStorage) SearchMetrics(fsq filters.SearchQuery, metricFilter *filters.Filter) (map[string][]common.Metric, error) {
 	flowset, err := c.SearchFlows(fsq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	flowset = flowset.Filter(metricFilter)
 	metrics := make(map[string][]common.Metric)
@@ -139,7 +139,7 @@ func (c *ObjectStorage) getAllFlows() (*flow.FlowSet, error) {
 
 	flowset := flow.NewFlowSet()
 	for _, objectKey := range objectKeys {
-		objectBytes, err := c.client.ReadObject(c.bucket, objectKey)
+		objectBytes, err := c.client.ReadObject(c.bucket, *objectKey)
 		if err != nil {
 			logging.GetLogger().Error("Failed to read object: ", err)
 			return nil, err
@@ -148,9 +148,9 @@ func (c *ObjectStorage) getAllFlows() (*flow.FlowSet, error) {
 		var flows []*flow.Flow
 		err = json.Unmarshal(objectBytes, &flows)
 		if err != nil {
-			logging.GetLogger().Warn("Failed to JSON-decode object: ", err)
+			logging.GetLogger().Warning("Failed to JSON-decode object: ", err)
 		} else {
-			flowset.Flows = append(flowset.Flows, *flows)
+			flowset.Flows = append(flowset.Flows, flows...)
 		}
 	}
 
@@ -161,7 +161,7 @@ func (c *ObjectStorage) getAllFlows() (*flow.FlowSet, error) {
 func (c *ObjectStorage) SearchFlows(fsq filters.SearchQuery) (*flow.FlowSet, error) {
 	flowset, err := c.getAllFlows()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return flowset.SearchQuery(fsq), nil
@@ -184,13 +184,8 @@ func New(backend string) *ObjectStorage {
 	bucket := config.GetConfig().GetString(path + ".bucket")
 	accessKey := config.GetConfig().GetString(path + ".access_key")
 	secretKey := config.GetConfig().GetString(path + ".secret_key")
-	entityID := config.GetConfig().GetString(path + ".entity_id")
-	collectorType := config.GetConfig().GetString(path + ".collector_type")
-	collectorID := strconv.Itoa(config.GetConfig().GetInt(path + ".collector_id"))
-	rootOutputDir := config.GetConfig().GetString(path + ".root_output_dir")
+	objectPrefix := config.GetConfig().GetString(path + ".object_prefix")
 	maxSecondsPerStream := config.GetConfig().GetInt(path + ".max_seconds_per_stream")
-
-	objectPrefix := strings.Join([]string{rootOutputDir, collectorType, region, entityID, collectorID}, "/")
 
 	client := objectstorage.New(endpoint, region, accessKey, secretKey)
 	os := &ObjectStorage{

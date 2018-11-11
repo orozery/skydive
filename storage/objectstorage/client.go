@@ -61,7 +61,7 @@ func (s *S3Client) ListObjects(bucket, prefix string) ([]*string, error) {
 		Bucket:          aws.String(bucket),
 		Prefix:          aws.String(prefix),
 	}
-	objectKeys := make([]string, 0)
+	objectKeys := make([]*string, 0)
 	fn := func(page *s3.ListObjectsV2Output, lastPage bool) bool {
 		for _, object := range page.Contents {
 			objectKeys = append(objectKeys, object.Key)

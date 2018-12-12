@@ -71,7 +71,7 @@ analyzer:
 
   # Flow storage engine
   flow:
-    # Storage backend name: myelasticsearch, myorientdb
+    # Storage backend name: myelasticsearch, myorientdb, myobjectstore
     # backend: myelasticsearch
 
     # Max number of flows in write buffer (after which all flows accumulated are dropped)
@@ -333,6 +333,17 @@ storage:
     # database: Skydive
     # username: root
     # password: hello
+
+  # Object Storage backend information.
+    myobjectstore:
+      # driver: objectstore
+      # endpoint: http://127.0.0.1:9000
+      # region: local
+      # bucket: bucket
+      # access_key: user
+      # secret_key: password
+      # object_prefix: logs
+      # max_seconds_per_stream: 86400
 
   # Memory backend
   mymemory:
